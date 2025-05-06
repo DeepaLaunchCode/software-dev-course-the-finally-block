@@ -39,28 +39,47 @@ Step 4: Test Your Solution
 */
 
 // ============================================
+// Custom Error Class for File Data Issues
+// ============================================
+class FileDataError extends Error {
+    constructor(message) {
+        super(message);
+        this.name = "FileDataError";
+    }
+}
+// ============================================
 // 🛠️ Starter Code: processFile Function
 // ============================================
 
 function processFile(fileName, fileData) {
   try {
       // 🔍 Input Validation
-      if (!fileName) {
-          throw new ReferenceError("File name is missing.");
+      // Added Addon validation for empty filename added for space char
+      if (!fileName || fileName.trim()==="") {
+          throw new ReferenceError("File name is missing or empty.");
       }
       if (typeof fileData !== "string") {
           throw new TypeError("File data must be a string.");
       }
       if (fileData.trim() === "") {
-          throw new Error("File data cannot be empty.");
+        // instead of general error catching we catch Custom Exceptions
+          throw new FileDataError("File data cannot be empty.");
       }
 
       // ✅ Simulated File Processing
       console.log(`Processing file: ${fileName}`);
       console.log(`File content: ${fileData}`);
   } catch (err) {
-      // ⚠️ Handle Known Errors
-      console.error(`${err.name}: ${err.message}`);
+    //we added extra logic in catch to categorize FileDataError 
+    if (err instanceof FileDataError)
+        {
+            console.log("File data function error happened:", err.message); // Handle known errors
+        }
+         else
+          { 
+              // ⚠️ Handle Known Errors
+            console.error(`${err.name}: ${err.message}`);
+            }
   } finally {
       // 📦 Always Release Resources
       console.log("Closing file handle...");
@@ -73,5 +92,8 @@ function processFile(fileName, fileData) {
 
 processFile(); // ❌ ReferenceError: File name is missing
 processFile("myFile.txt", 42); // ❌ TypeError: File data must be a string
-processFile("myFile.txt", ""); // ❌ Error: File data cannot be empty
-processFile("myFile.txt", "Hello, world!"); // ✅ Should process successfully
+//processFile("myFile.txt", ""); // ❌ Error: File data cannot be empty
+//processFile("myFile.txt", "Hello, world!"); // ✅ Should process successfully
+//processFile(" ", ""); // ❌ Error: File name is missing or empty
+processFile(" ",null); // ❌ Error: File name is missing or empty
+
